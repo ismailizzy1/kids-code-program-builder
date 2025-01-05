@@ -104,7 +104,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 👥 Authors
 
-- Ismail - *Initial work* - [YourGithubUsername](https://github.com/ismailizzy1)
+- Ismail - *Initial work* - [ismailizzy1](https://github.com/ismailizzy1)
 
 ## 🙏 Acknowledgments
 
