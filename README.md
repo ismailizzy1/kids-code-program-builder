@@ -31,7 +31,7 @@ A fun and interactive drag-and-drop coding platform designed specifically for ch
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/kids-code-program-builder.git
+git clone https://github.com/ismailizzy1/kids-code-program-builder.git
 ```
 
 2. Install dependencies:
@@ -104,7 +104,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 👥 Authors
 
-- Your Name - *Initial work* - [YourGithubUsername](https://github.com/YourGithubUsername)
+- Ismail - *Initial work* - [YourGithubUsername](https://github.com/ismailizzy1)
 
 ## 🙏 Acknowledgments
 
@@ -115,9 +115,9 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 🆘 Support
 
 If you encounter any issues or need help:
-1. Check the [Issues](https://github.com/yourusername/kids-code-program-builder/issues) page
+1. Check the [Issues](https://github.com/ismailizzy1/kids-code-program-builder/issues) page
 2. Create a new issue with detailed information about your problem
-3. Join our [Discord community](your-discord-link) for real-time support
+3. Contact me on Discord: `izzy_6.9`
 
 ## 🔮 Future Development
 
