@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Kids Code Builder</title>
+    <script src="node_modules/blockly/blockly_compressed.js"></script>
+    <script src="node_modules/blockly/blocks_compressed.js"></script>
+    <script src="node_modules/blockly/javascript_compressed.js"></script>
+    <script src="node_modules/blockly/msg/en.js"></script>
+    <script src="node_modules/sweetalert2/dist/sweetalert2.all.min.js"></script>
+    <script src="node_modules/howler/dist/howler.min.js"></script>
+    <script src="node_modules/canvas-confetti/dist/confetti.browser.js"></script>
+    <link rel="stylesheet" href="node_modules/@fortawesome/fontawesome-free/css/all.min.css">
+    <link rel="stylesheet" href="node_modules/animate.css/animate.min.css">
+    <style>
+        :root {
+            --primary-color: #6C63FF;
+            --secondary-color: #4CAF50;
+            --background-color: #f8f9fa;
+            --text-color: #2c3e50;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--background-color);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            color: var(--text-color);
+        }
+        
+        #header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        #header h1 {
+            margin: 0;
+            font-size: 2em;
+            animation: bounceIn 1s;
+        }
+
+        .workspace-container {
+            display: flex;
+            flex-grow: 1;
+            position: relative;
+        }
+
+        #blocklyDiv {
+            flex-grow: 1;
+            height: calc(100vh - 140px);
+        }
+
+        #output-panel {
+            width: 300px;
+            background: white;
+            padding: 15px;
+            box-shadow: -2px 0 5px rgba(0,0,0,0.1);
+            display: none;
+            overflow-y: auto;
+        }
+
+        #controls {
+            padding: 15px;
+            text-align: center;
+            background-color: white;
+            box-shadow: 0 -2px 4px rgba(0,0,0,0.1);
+        }
+
+        .button {
+            background: var(--primary-color);
+            border: none;
+            color: white;
+            padding: 12px 24px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 8px;
+            cursor: pointer;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .button i {
+            margin-right: 8px;
+        }
+
+        #tutorial-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+
+        .category-label {
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .output-content {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 10px;
+            margin-top: 10px;
+        }
+
+        #theme-toggle {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 1.2em;
+        }
+
+        #animation-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        .character-preview {
+            position: fixed;
+            width: 100px;
+            height: 100px;
+            transition: all 0.3s ease;
+            z-index: 999;
+        }
+
+        .emoji-button {
+            font-size: 24px;
+            padding: 10px;
+            margin: 5px;
+            border: none;
+            background: none;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .emoji-button:hover {
+            transform: scale(1.2);
+        }
+
+        .achievement {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #4CAF50, #2196F3);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            animation: slideInRight 0.5s ease;
+            z-index: 1000;
+        }
+
+        #character-select {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            display: none;
+            z-index: 1001;
+        }
+
+        .character-option {
+            font-size: 40px;
+            margin: 10px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .character-option:hover {
+            transform: scale(1.2);
+        }
+    </style>
+</head>
+<body>
+    <canvas id="animation-canvas"></canvas>
+    
+    <div id="header">
+        <h1>🚀 Kids Code Builder</h1>
+        <button id="theme-toggle" onclick="toggleTheme()">
+            <i class="fas fa-moon"></i>
+        </button>
+    </div>
+
+    <div class="workspace-container">
+        <div id="blocklyDiv"></div>
+        <div id="output-panel">
+            <h3><i class="fas fa-terminal"></i> Output</h3>
+            <div id="output-content" class="output-content"></div>
+        </div>
+    </div>
+    
+    <div id="controls">
+        <button class="button" onclick="runCode()">
+            <i class="fas fa-play"></i> Run Program
+        </button>
+        <button class="button" onclick="saveBlocks()">
+            <i class="fas fa-save"></i> Save
+        </button>
+        <button class="button" onclick="loadBlocks()">
+            <i class="fas fa-folder-open"></i> Load
+        </button>
+        <button class="button" onclick="toggleOutput()">
+            <i class="fas fa-terminal"></i> Toggle Output
+        </button>
+        <button class="button" onclick="shareProject()">
+            <i class="fas fa-share-alt"></i> Share
+        </button>
+        <button class="button" onclick="chooseCharacter()">
+            <i class="fas fa-user-astronaut"></i> Choose Character
+        </button>
+    </div>
+
+    <button id="tutorial-btn" class="button" onclick="startTutorial()">
+        <i class="fas fa-question-circle"></i> Help
+    </button>
+
+    <div id="character-select">
+        <h3>Choose Your Character!</h3>
+        <div class="character-options">
+            <span class="character-option" onclick="selectCharacter('🚀')">🚀</span>
+            <span class="character-option" onclick="selectCharacter('🐱')">🐱</span>
+            <span class="character-option" onclick="selectCharacter('🤖')">🤖</span>
+            <span class="character-option" onclick="selectCharacter('🦄')">🦄</span>
+            <span class="character-option" onclick="selectCharacter('🐶')">🐶</span>
+        </div>
+    </div>
+
+    <xml id="toolbox" style="display: none">
+        <category name="Character" colour="#FF4081">
+            <block type="move_character"></block>
+            <block type="change_character"></block>
+            <block type="character_say"></block>
+            <block type="character_dance"></block>
+            <block type="character_jump"></block>
+            <block type="character_spin"></block>
+            <block type="character_size"></block>
+            <block type="character_emotion"></block>
+        </category>
+        <category name="Animation" colour="#FF5722">
+            <block type="create_effect"></block>
+            <block type="play_animation"></block>
+            <block type="change_background"></block>
+            <block type="add_emoji"></block>
+            <block type="particle_effect"></block>
+            <block type="rainbow_trail"></block>
+            <block type="bounce_effect"></block>
+            <block type="fade_effect"></block>
+        </category>
+        <category name="Sounds" colour="#9C27B0">
+            <block type="play_music"></block>
+            <block type="play_sound_effect"></block>
+            <block type="stop_music"></block>
+            <block type="change_volume"></block>
+            <block type="create_melody"></block>
+            <block type="drum_beat"></block>
+            <block type="voice_effect"></block>
+        </category>
+        <category name="Drawing" colour="#2196F3">
+            <block type="draw_shape"></block>
+            <block type="set_color"></block>
+            <block type="clear_canvas"></block>
+            <block type="draw_pattern"></block>
+            <block type="paint_bucket"></block>
+            <block type="draw_gradient"></block>
+            <block type="stamp_tool"></block>
+            <block type="mirror_draw"></block>
+        </category>
+        <category name="Games" colour="#4CAF50">
+            <block type="start_game"></block>
+            <block type="add_points"></block>
+            <block type="check_collision"></block>
+            <block type="game_over"></block>
+            <block type="create_level"></block>
+            <block type="add_powerup"></block>
+            <block type="set_timer"></block>
+            <block type="collect_item"></block>
+        </category>
+        <category name="Story" colour="#795548">
+            <block type="start_story"></block>
+            <block type="add_scene"></block>
+            <block type="character_dialog"></block>
+            <block type="change_scene"></block>
+            <block type="add_choice"></block>
+            <block type="show_message"></block>
+            <block type="wait_for_click"></block>
+        </category>
+        <category name="Control" colour="#FF9800">
+            <block type="wait_seconds"></block>
+            <block type="repeat_times"></block>
+            <block type="forever"></block>
+            <block type="if_then"></block>
+            <block type="when_key_pressed"></block>
+            <block type="when_clicked"></block>
+            <block type="stop_all"></block>
+        </category>
+        <category name="Math" colour="#607D8B">
+            <block type="math_number"></block>
+            <block type="math_arithmetic"></block>
+            <block type="math_random"></block>
+            <block type="count_up_down"></block>
+            <block type="number_slider"></block>
+            <block type="calculate_distance"></block>
+            <block type="compare_numbers"></block>
+        </category>
+        <category name="Variables" custom="VARIABLE" colour="#9E9E9E">
+        </category>
+        <category name="Functions" custom="PROCEDURE" colour="#3F51B5">
+        </category>
+        <sep></sep>
+        <category name="Templates" colour="#E91E63">
+            <block type="simple_game"></block>
+            <block type="interactive_story"></block>
+            <block type="animation_sequence"></block>
+            <block type="music_maker"></block>
+            <block type="art_canvas"></block>
+        </category>
+    </xml>
+
+    <script src="renderer.js"></script>
+</body>
+</html>
